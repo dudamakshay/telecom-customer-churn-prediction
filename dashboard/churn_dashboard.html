@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Telecom Churn Analytics Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff4d6d;
+    --accent3: #00e096;
+    --accent4: #ffb547;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --font: 'Syne', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { position: relative; z-index: 1; padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-block {}
+  .company { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  h1 span { color: var(--accent); }
+  .header-right { text-align: right; }
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,224,150,0.1); border: 1px solid rgba(0,224,150,0.3);
+    border-radius: 20px; padding: 4px 12px;
+    font-family: var(--mono); font-size: 11px; color: var(--accent3);
+  }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .date { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;
+  }
+  .filter-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .filter-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--font); font-size: 12px; font-weight: 600;
+    padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  /* ── KPI CARDS ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    animation: fadeUp 0.5s ease backwards;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .kpi-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--card-accent, var(--accent));
+  }
+  .kpi-card:nth-child(1) { --card-accent: var(--accent); animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { --card-accent: var(--accent2); animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { --card-accent: var(--accent4); animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { --card-accent: var(--accent3); animation-delay: 0.2s; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .kpi-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .kpi-value { font-size: 34px; font-weight: 800; letter-spacing: -1px; color: var(--card-accent, var(--accent)); }
+  .kpi-sub { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+  .kpi-delta { font-size: 11px; margin-top: 8px; font-weight: 600; }
+  .kpi-delta.up { color: var(--accent2); }
+  .kpi-delta.down { color: var(--accent3); }
+
+  /* ── GRID LAYOUT ── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .charts-grid-3 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    animation: fadeUp 0.5s ease backwards;
+  }
+  .chart-card:nth-child(1) { animation-delay: 0.25s; }
+  .chart-card:nth-child(2) { animation-delay: 0.3s; }
+  .chart-card:nth-child(3) { animation-delay: 0.35s; }
+
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.2px; margin-bottom: 4px; }
+  .chart-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 18px; }
+
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-name { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 130px; flex-shrink: 0; text-align: right; }
+  .bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 28px; overflow: hidden; position: relative; }
+  .bar-fill {
+    height: 100%; border-radius: 4px;
+    display: flex; align-items: center; padding: 0 10px;
+    font-size: 12px; font-weight: 700; color: var(--bg);
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+    width: 0;
+  }
+
+  /* ── DONUT CHART ── */
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .donut-svg-wrap { position: relative; }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .donut-pct { font-size: 28px; font-weight: 800; color: var(--accent2); }
+  .donut-lbl { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-family: var(--mono); font-size: 11px; color: var(--muted); flex: 1; }
+  .legend-val { font-size: 12px; font-weight: 700; }
+
+  /* ── GAUGE ── */
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── RISK TABLE ── */
+  .risk-table { width: 100%; border-collapse: collapse; }
+  .risk-table th {
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .risk-table td { padding: 9px 10px; font-size: 12px; border-bottom: 1px solid rgba(30,45,69,0.5); }
+  .risk-table tr:hover td { background: var(--surface2); }
+  .risk-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+  }
+  .risk-high { background: rgba(255,77,109,0.15); color: var(--accent2); border: 1px solid rgba(255,77,109,0.3); }
+  .risk-med { background: rgba(255,181,71,0.15); color: var(--accent4); border: 1px solid rgba(255,181,71,0.3); }
+  .risk-low { background: rgba(0,224,150,0.1); color: var(--accent3); border: 1px solid rgba(0,224,150,0.2); }
+
+  /* ── FULL WIDTH CHART (TENURE LINE) ── */
+  .full-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.5s 0.4s ease backwards;
+  }
+
+  .line-chart-wrap { position: relative; height: 160px; }
+  .line-chart-svg { width: 100%; height: 100%; }
+
+  /* ── INSIGHTS ROW ── */
+  .insights-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 0; }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-left: 3px solid var(--ins-color, var(--accent));
+    animation: fadeUp 0.5s ease backwards;
+  }
+  .insight-card:nth-child(1) { --ins-color: var(--accent2); animation-delay: 0.5s; }
+  .insight-card:nth-child(2) { --ins-color: var(--accent4); animation-delay: 0.55s; }
+  .insight-card:nth-child(3) { --ins-color: var(--accent3); animation-delay: 0.6s; }
+  .insight-icon { font-size: 22px; margin-bottom: 10px; }
+  .insight-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--ins-color, var(--accent)); }
+  .insight-text { font-size: 12px; color: var(--muted); line-height: 1.6; font-family: var(--mono); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-block">
+      <div class="company">TelecomCorp Analytics · Data Science Division</div>
+      <h1>Customer Churn <span>Intelligence</span></h1>
+    </div>
+    <div class="header-right">
+      <div class="live-badge"><div class="live-dot"></div> LIVE DASHBOARD</div>
+      <div class="date" id="dateLbl"></div>
+    </div>
+  </header>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <span class="filter-label">SEGMENT ▸</span>
+    <button class="filter-btn active" onclick="setFilter(this,'all')">All Customers</button>
+    <button class="filter-btn" onclick="setFilter(this,'mtm')">Month-to-Month</button>
+    <button class="filter-btn" onclick="setFilter(this,'1yr')">One Year</button>
+    <button class="filter-btn" onclick="setFilter(this,'2yr')">Two Year</button>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Customers</div>
+      <div class="kpi-value" id="kpi-total">7,043</div>
+      <div class="kpi-sub">Active accounts</div>
+      <div class="kpi-delta down">↑ 3.2% vs last quarter</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Churned Customers</div>
+      <div class="kpi-value" id="kpi-churned">1,869</div>
+      <div class="kpi-sub">Left in period</div>
+      <div class="kpi-delta up">↑ 1.1% vs last quarter</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Churn Rate</div>
+      <div class="kpi-value" id="kpi-rate">26.5%</div>
+      <div class="kpi-sub">Industry avg: 21%</div>
+      <div class="kpi-delta up">▲ 5.5pp above benchmark</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Revenue at Risk</div>
+      <div class="kpi-value" id="kpi-rev">$121K</div>
+      <div class="kpi-sub">Monthly loss (churned)</div>
+      <div class="kpi-delta down">↓ Recoverable via retention</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: BAR CHART + DONUT -->
+  <div class="charts-grid">
+
+    <!-- CONTRACT CHURN BAR -->
+    <div class="chart-card">
+      <div class="chart-title">Churn Rate by Contract Type</div>
+      <div class="chart-sub">Percentage of customers who left, by contract category</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-name">Month-to-Month</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="background:var(--accent2);" data-pct="85.4" data-label="42.7%"></div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">One Year</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="background:var(--accent4);" data-pct="22.6" data-label="11.3%"></div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Two Year</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="background:var(--accent3);" data-pct="5.6" data-label="2.8%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="chart-title">Churn Rate by Internet Service</div>
+        <div class="chart-sub">Fiber Optic users are highest risk despite premium pricing</div>
+        <div class="bar-chart" style="margin-top:14px;">
+          <div class="bar-row">
+            <div class="bar-name">Fiber Optic</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="background:var(--accent2);" data-pct="83.8" data-label="41.9%"></div>
+            </div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">DSL</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="background:var(--accent);" data-pct="38.0" data-label="19.0%"></div>
+            </div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">No Internet</div>
+            <div class="bar-track">
+              <div class="bar-fill" style="background:var(--accent3);" data-pct="14.8" data-label="7.4%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONUT + FEATURE IMPORTANCE -->
+    <div class="chart-card">
+      <div class="chart-title">Overall Churn Split</div>
+      <div class="chart-sub">1,869 churned vs 5,174 retained</div>
+      <div class="donut-wrap">
+        <div class="donut-svg-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--surface2)" stroke-width="22"/>
+            <!-- Churned slice: 26.5% of 376.99 = 99.8 -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--accent2)" stroke-width="22"
+                    stroke-dasharray="99.8 277.2" stroke-dashoffset="94.25"
+                    stroke-linecap="round"/>
+            <!-- Retained -->
+            <circle cx="80" cy="80" r="60" fill="none" stroke="var(--accent3)" stroke-width="22"
+                    stroke-dasharray="274.2 102.8" stroke-dashoffset="-5.55"
+                    stroke-linecap="round" opacity="0.5"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-pct">26.5%</div>
+            <div class="donut-lbl">CHURN RATE</div>
+          </div>
+        </div>
+        <div class="donut-legend" style="max-width:220px;">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--accent2)"></div>
+            <div class="legend-label">Churned</div>
+            <div class="legend-val" style="color:var(--accent2)">1,869</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--accent3)"></div>
+            <div class="legend-label">Retained</div>
+            <div class="legend-val" style="color:var(--accent3)">5,174</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px; border-top:1px solid var(--border); padding-top:18px;">
+        <div class="chart-title">Top Churn Drivers (ML Feature Importance)</div>
+        <div class="chart-sub">Random Forest — ranked by impact</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <div id="fi-bars"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TENURE LINE CHART -->
+  <div class="full-card">
+    <div class="chart-title">Churn Rate Across Customer Tenure</div>
+    <div class="chart-sub">New customers (0–12 months) are highest risk — loyalty builds over time</div>
+    <div class="line-chart-wrap">
+      <svg class="line-chart-svg" viewBox="0 0 800 140" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ff4d6d" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#ff4d6d" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="0" y1="20" x2="800" y2="20" stroke="var(--border)" stroke-width="1"/>
+        <line x1="0" y1="60" x2="800" y2="60" stroke="var(--border)" stroke-width="1"/>
+        <line x1="0" y1="100" x2="800" y2="100" stroke="var(--border)" stroke-width="1"/>
+        <!-- Labels -->
+        <text x="5" y="18" fill="#64748b" font-size="9" font-family="DM Mono">50%</text>
+        <text x="5" y="58" fill="#64748b" font-size="9" font-family="DM Mono">30%</text>
+        <text x="5" y="98" fill="#64748b" font-size="9" font-family="DM Mono">10%</text>
+        <!-- Area fill -->
+        <path d="M40,30 C80,32 100,48 140,55 C200,64 260,70 320,75 C380,80 440,82 500,84 C560,86 620,88 680,90 C720,91 760,92 790,92 L790,110 L40,110 Z"
+              fill="url(#lineGrad)"/>
+        <!-- Line -->
+        <path d="M40,30 C80,32 100,48 140,55 C200,64 260,70 320,75 C380,80 440,82 500,84 C560,86 620,88 680,90 C720,91 760,92 790,92"
+              fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Dots -->
+        <circle cx="40" cy="30" r="5" fill="var(--accent2)"/>
+        <circle cx="200" cy="64" r="4" fill="var(--accent2)"/>
+        <circle cx="380" cy="80" r="4" fill="var(--accent2)"/>
+        <circle cx="560" cy="86" r="4" fill="var(--accent2)"/>
+        <circle cx="790" cy="92" r="4" fill="var(--accent2)"/>
+        <!-- Axis labels -->
+        <text x="30" y="130" fill="#64748b" font-size="9" font-family="DM Mono">0-6mo</text>
+        <text x="185" y="130" fill="#64748b" font-size="9" font-family="DM Mono">12-18mo</text>
+        <text x="366" y="130" fill="#64748b" font-size="9" font-family="DM Mono">24-30mo</text>
+        <text x="545" y="130" fill="#64748b" font-size="9" font-family="DM Mono">36-48mo</text>
+        <text x="760" y="130" fill="#64748b" font-size="9" font-family="DM Mono">60+mo</text>
+        <!-- Annotations -->
+        <rect x="15" y="10" width="100" height="16" rx="3" fill="rgba(255,77,109,0.1)" stroke="rgba(255,77,109,0.3)" stroke-width="1"/>
+        <text x="20" y="21" fill="var(--accent2)" font-size="9" font-family="DM Mono" font-weight="bold">⚠ CRITICAL ZONE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ROW: RISK TABLE + INSIGHTS -->
+  <div class="charts-grid-3">
+
+    <!-- HIGH RISK TABLE -->
+    <div class="chart-card">
+      <div class="chart-title">High-Risk Customer Sample</div>
+      <div class="chart-sub">Month-to-month · Fiber optic · No security add-ons · Tenure &lt; 12mo</div>
+      <table class="risk-table">
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Tenure</th>
+            <th>Monthly $</th>
+            <th>Contract</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody id="riskBody"></tbody>
+      </table>
+    </div>
+
+    <!-- MODEL RESULTS -->
+    <div class="chart-card">
+      <div class="chart-title">ML Model Performance</div>
+      <div class="chart-sub">Logistic Regression vs Random Forest</div>
+      <div style="display:flex;flex-direction:column;gap:16px;margin-top:8px;">
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;">LOGISTIC REGRESSION</div>
+          <div style="font-size:28px;font-weight:800;color:var(--accent);">81.76%</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);">Accuracy · ROC-AUC 0.85</div>
+          <div style="background:var(--surface2);border-radius:4px;height:6px;margin-top:8px;">
+            <div style="width:81.76%;height:100%;background:var(--accent);border-radius:4px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;">RANDOM FOREST</div>
+          <div style="font-size:28px;font-weight:800;color:var(--accent4);">79.84%</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);">Accuracy · ROC-AUC 0.83</div>
+          <div style="background:var(--surface2);border-radius:4px;height:6px;margin-top:8px;">
+            <div style="width:79.84%;height:100%;background:var(--accent4);border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:14px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px;">CONFUSION MATRIX (RF)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:rgba(0,224,150,0.1);border:1px solid rgba(0,224,150,0.2);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:var(--accent3);">944</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">TRUE NEG</div>
+            </div>
+            <div style="background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.2);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:var(--accent2);">92</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">FALSE POS</div>
+            </div>
+            <div style="background:rgba(255,181,71,0.08);border:1px solid rgba(255,181,71,0.2);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:var(--accent4);">192</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">FALSE NEG</div>
+            </div>
+            <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:var(--accent);">181</div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--muted);">TRUE POS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights-row">
+    <div class="insight-card">
+      <div class="insight-icon">⚡</div>
+      <div class="insight-title">Contract Type is #1 Driver</div>
+      <div class="insight-text">Month-to-month customers churn at 42.7% — 15× higher than two-year contracts. Converting just 10% of M-t-M customers to annual plans saves ~$50K/month.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🔥</div>
+      <div class="insight-title">Fiber Optic Quality Crisis</div>
+      <div class="insight-text">Fiber users pay ~$91/month avg but churn at 41.9%. This signals a value-perception gap — not a pricing issue. Immediate service quality audit recommended.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🛡️</div>
+      <div class="insight-title">Add-Ons Reduce Churn</div>
+      <div class="insight-text">Customers with OnlineSecurity and TechSupport churn at significantly lower rates. Bundling these into base plans during onboarding could cut churn by ~15%.</div>
+    </div>
+  </div>
+
+  <footer>
+    <div>TelecomCorp · Customer Analytics Division · Confidential</div>
+    <div>Python · SQL · Power BI · scikit-learn · pandas</div>
+    <div id="footerDate"></div>
+  </footer>
+</div>
+
+<script>
+  // Date
+  const now = new Date();
+  const fmt = now.toLocaleDateString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('dateLbl').textContent = fmt;
+  document.getElementById('footerDate').textContent = 'Refreshed: ' + fmt;
+
+  // Animate bars on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(bar => {
+        const pct = bar.dataset.pct;
+        const label = bar.dataset.label;
+        bar.style.width = pct + '%';
+        bar.textContent = label;
+      });
+    }, 300);
+  });
+
+  // Feature importance bars
+  const features = [
+    { name: 'MonthlyCharges', pct: 17.7, color: 'var(--accent2)' },
+    { name: 'tenure',         pct: 17.5, color: 'var(--accent)' },
+    { name: 'TotalCharges',   pct: 16.8, color: 'var(--accent4)' },
+    { name: 'Contract',       pct: 8.2,  color: 'var(--accent3)' },
+    { name: 'PaymentMethod',  pct: 5.1,  color: 'var(--accent)' },
+  ];
+  const fiContainer = document.getElementById('fi-bars');
+  features.forEach(f => {
+    fiContainer.innerHTML += `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);width:110px;text-align:right;">${f.name}</div>
+        <div style="flex:1;background:var(--surface2);border-radius:3px;height:18px;overflow:hidden;">
+          <div style="width:${f.pct*3.5}%;height:100%;background:${f.color};border-radius:3px;display:flex;align-items:center;padding:0 6px;">
+            <span style="font-size:10px;font-weight:700;color:var(--bg);">${f.pct}%</span>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // Risk table
+  const customers = [
+    { id:'CUST-4471', tenure:3,  charge:95.7,  risk:'HIGH RISK' },
+    { id:'CUST-2203', tenure:7,  charge:88.5,  risk:'HIGH RISK' },
+    { id:'CUST-6618', tenure:11, charge:104.2, risk:'HIGH RISK' },
+    { id:'CUST-0891', tenure:5,  charge:79.9,  risk:'HIGH RISK' },
+    { id:'CUST-3344', tenure:18, charge:72.0,  risk:'MEDIUM RISK'},
+    { id:'CUST-7720', tenure:22, charge:65.5,  risk:'MEDIUM RISK'},
+    { id:'CUST-1159', tenure:9,  charge:91.0,  risk:'HIGH RISK' },
+    { id:'CUST-5502', tenure:30, charge:55.0,  risk:'LOW RISK'  },
+  ];
+  const tbody = document.getElementById('riskBody');
+  customers.forEach(c => {
+    const cls = c.risk === 'HIGH RISK' ? 'risk-high' : c.risk === 'MEDIUM RISK' ? 'risk-med' : 'risk-low';
+    const contract = c.risk === 'LOW RISK' ? 'One Year' : 'Month-Month';
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-family:var(--mono);font-size:11px;">${c.id}</td>
+        <td>${c.tenure} mo</td>
+        <td>$${c.charge}</td>
+        <td style="font-family:var(--mono);font-size:10px;">${contract}</td>
+        <td><span class="risk-badge ${cls}">${c.risk}</span></td>
+      </tr>`;
+  });
+
+  // Filter buttons
+  const filterData = {
+    all:  { total:'7,043', churned:'1,869', rate:'26.5%', rev:'$121K' },
+    mtm:  { total:'3,875', churned:'1,655', rate:'42.7%', rev:'$95K'  },
+    '1yr':{ total:'1,473', churned:'166',   rate:'11.3%', rev:'$14K'  },
+    '2yr':{ total:'1,695', churned:'48',    rate:'2.8%',  rev:'$3.4K' },
+  };
+
+  function setFilter(btn, key) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const d = filterData[key];
+    document.getElementById('kpi-total').textContent   = d.total;
+    document.getElementById('kpi-churned').textContent = d.churned;
+    document.getElementById('kpi-rate').textContent    = d.rate;
+    document.getElementById('kpi-rev').textContent     = d.rev;
+  }
+</script>
+</body>
+</html>
