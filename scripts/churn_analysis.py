@@ -1,5 +1,10 @@
 # ============================================================
 # TELECOM CUSTOMER CHURN PREDICTION
+# Machine Learning Problem Type: Binary Classification
+# Target Variable: Churn (Yes/No)
+# Models Used:
+# 1. Logistic Regression Classifier
+# 2. Random Forest Classifier
 # Company: TelecomCorp Analytics Team
 # Author: Senior Data Scientist
 # Version: 1.0  |  Date: 2025
@@ -17,7 +22,7 @@ warnings.filterwarnings('ignore')
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import model = RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import (
     accuracy_score, classification_report,
@@ -182,12 +187,13 @@ print(f"\nTraining Set : {X_train.shape[0]} samples")
 print(f"Test Set     : {X_test.shape[0]} samples")
 
 # ─────────────────────────────────────────
-# SECTION 8: MODEL 1 — LOGISTIC REGRESSION
+## SECTION 8: MODEL 1 — LOGISTIC REGRESSION CLASSIFIER
 # ─────────────────────────────────────────
 print("\n" + "=" * 60)
-print("MODEL 1: LOGISTIC REGRESSION")
+print("MODEL 1: LOGISTIC REGRESSION CLASSIFIER")
 print("=" * 60)
-
+# Classification Model
+# Algorithm: Logistic Regression Classifier
 lr_model = LogisticRegression(max_iter=1000, random_state=42)
 lr_model.fit(X_train, y_train)
 lr_pred = lr_model.predict(X_test)
@@ -220,7 +226,7 @@ cm = confusion_matrix(y_test, rf_pred)
 print(cm)
 
 # ─────────────────────────────────────────
-# SECTION 10: FEATURE IMPORTANCE (Random Forest)
+# Feature Importance (Random Forest Classifier)
 # ─────────────────────────────────────────
 feat_imp = pd.Series(rf_model.feature_importances_, index=X.columns) \
              .sort_values(ascending=True)
@@ -230,14 +236,14 @@ fig.suptitle('Telecom Churn — Model Evaluation', fontsize=15, fontweight='bold
 
 # Feature Importance Plot
 feat_imp.tail(12).plot(kind='barh', ax=axes[0], color='#3498db')
-axes[0].set_title('Top 12 Feature Importances (Random Forest)')
+axes[0].set_title('Top 12 Feature Importances (Random Forest Classifier)')
 axes[0].set_xlabel('Importance Score')
 
 # Confusion Matrix Heatmap
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[1],
             xticklabels=['Retained', 'Churned'],
             yticklabels=['Retained', 'Churned'])
-axes[1].set_title('Confusion Matrix — Random Forest')
+axes[1].set_title('Confusion Matrix — Random Forest Classifier')
 axes[1].set_ylabel('Actual')
 axes[1].set_xlabel('Predicted')
 
@@ -248,6 +254,11 @@ print("Model chart saved: churn_model.png")
 
 print("\n" + "=" * 60)
 print("PROJECT COMPLETE — READY FOR DEPLOYMENT")
+print("\nMachine Learning Summary")
+print("-" * 40)
+print("Problem Type : Binary Classification")
+print("Model 1      : Logistic Regression Classifier")
+print("Model 2      : Random Forest Classifier")
 print("=" * 60)
 
 import os
@@ -257,6 +268,6 @@ import joblib
 os.makedirs("model", exist_ok=True)
 
 # Save model
-joblib.dump(lr_model, "model/churn_model.pkl")
+joblib.dump(lr_model, "model/logistic_regression_classifier.pkl")
 
 print("Model saved successfully in model/churn_model.pkl")

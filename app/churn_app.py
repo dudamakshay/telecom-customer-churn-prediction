@@ -87,10 +87,15 @@ def train_models(df):
     )
 
     models = {
-        'Logistic Regression':   LogisticRegression(max_iter=1000, random_state=42),
-        'Random Forest':         RandomForestClassifier(n_estimators=100, random_state=42),
-        'Gradient Boosting':     GradientBoostingClassifier(n_estimators=100, random_state=42),
-    }
+    'Logistic Regression Classifier':
+        LogisticRegression(max_iter=1000, random_state=42),
+
+    'Random Forest Classifier':
+        RandomForestClassifier(n_estimators=100, random_state=42),
+
+    'Gradient Boosting Classifier':
+        GradientBoostingClassifier(n_estimators=100, random_state=42),
+}
 
     results = {}
     for name, model in models.items():
@@ -106,7 +111,7 @@ def train_models(df):
             'cm':       confusion_matrix(y_test, pred),
             'report':   classification_report(y_test, pred, target_names=['Retained','Churned'])
         }
-    return results, X_test, y_test, X.columns.tolist(), models['Random Forest']
+    return results, X_test, y_test, X.columns.tolist(), models['Random Forest Classifier']
 
 # ── SIDEBAR ──────────────────────────────────────────────────
 with st.sidebar:
@@ -119,8 +124,7 @@ with st.sidebar:
         ["📊 Executive Dashboard",
          "🔍 EDA & Insights",
          "🤖 ML Models",
-         "🎯 Predict Customer Risk",
-         "💡 Interview Guide"]
+         "🎯 Predict Customer Risk"]
     )
     st.divider()
     st.caption("Dataset: 7,043 customers | 20 features")
@@ -356,21 +360,34 @@ elif page == "🔍 EDA & Insights":
 
 # ════════════════════════════════════════════════════════════
 # PAGE 3: ML MODELS
-# ════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════
 elif page == "🤖 ML Models":
     st.title("🤖 Machine Learning Model Comparison")
+
+    st.info("Problem Type: Binary Classification")
+
+    st.write("Models Used:")
+    st.write("• Logistic Regression Classifier")
+    st.write("• Random Forest Classifier")
+    st.write("• Gradient Boosting Classifier")
+
     st.caption("Logistic Regression vs Random Forest vs Gradient Boosting")
 
     # Model comparison table
+        # Model comparison table
     comp_df = pd.DataFrame({
         'Model': list(results.keys()),
         'Accuracy': [f"{v['accuracy']:.4f}" for v in results.values()],
-        'ROC-AUC':  [f"{v['roc_auc']:.4f}" for v in results.values()],
-        'Best For': ['Explainability & speed', 'Balanced accuracy + feature importance', 'Highest performance']
+        'ROC-AUC': [f"{v['roc_auc']:.4f}" for v in results.values()],
+        'Best For': [
+            'Binary Classification with Explainability',
+            'Classification with Feature Importance',
+            'High-Performance Classification'
+        ]
     })
+
     st.subheader("📊 Model Comparison")
     st.dataframe(comp_df, hide_index=True, use_container_width=True)
-
     # Select model to inspect
     selected = st.selectbox("Choose model to inspect in detail",
                              list(results.keys()))
@@ -418,7 +435,7 @@ elif page == "🤖 ML Models":
     st.code(res['report'])
 
     # Feature Importance (RF only)
-    if selected == 'Random Forest':
+    if selected == 'Random Forest Classifier':
         st.subheader("🎯 Top 15 Feature Importances")
         df_model_fi = df.copy()
         df_model_fi['TotalCharges'] = pd.to_numeric(df_model_fi['TotalCharges'], errors='coerce').fillna(0)
@@ -547,85 +564,3 @@ elif page == "🎯 Predict Customer Risk":
             else:
                 st.success("✅ Customer is stable — maintain quality")
                 st.success("🌟 Candidate for upsell/cross-sell")
-
-# ════════════════════════════════════════════════════════════
-# PAGE 5: INTERVIEW GUIDE
-# ════════════════════════════════════════════════════════════
-elif page == "💡 Interview Guide":
-    st.title("💡 Interview Preparation Guide")
-    st.caption("Beginner-friendly explanations — say these in your interview!")
-
-    tab1, tab2, tab3 = st.tabs(["🎤 1-Min Pitch", "❓ Q&A", "⚠️ Avoid These Mistakes"])
-
-    with tab1:
-        st.subheader("Your 1-Minute Project Explanation")
-        st.success("""
-**"I built an end-to-end Customer Churn Prediction project for a telecom company.**
-
-The company had 7,043 customers and was losing 26.5% of them — that's $139,000 every month in lost revenue.
-
-I used SQL to analyze patterns — I found that month-to-month contract customers churn at 42.7%, while two-year contract customers only churn at 2.8%. That's a 15x difference.
-
-In Python, I built three machine learning models — Logistic Regression, Random Forest, and Gradient Boosting. My best model achieved 81.76% accuracy and a ROC-AUC score of 0.85.
-
-I identified the top churn drivers: monthly charges, tenure, and contract type. Finally, I built a Streamlit app where any team member can enter a customer's details and instantly see their churn risk score.
-
-The business outcome: by targeting just the top 500 high-risk customers each month, the company can potentially save $50,000+ in monthly revenue."**
-        """)
-
-        st.subheader("30-Second Version (for quick intro)")
-        st.info("""
-**"I built a churn prediction model for a telecom company with 7,043 customers.
-The churn rate was 26.5%, causing $139K monthly revenue loss.
-I used Python and SQL for analysis, built ML models achieving 81.76% accuracy,
-and identified that contract type and monthly charges are the biggest churn drivers.
-The model helps the retention team target high-risk customers before they leave."**
-        """)
-
-    with tab2:
-        qas = [
-            ("Q1: What is churn and why does it matter?",
-             "Churn means a customer stopped using our service. It matters because getting a new customer costs 5x more than keeping an existing one. In our dataset, 1,869 customers left — causing $139,000 in monthly revenue loss."),
-            ("Q2: What data did you use?",
-             "I used a telecom dataset with 7,043 customers and 20 columns — including demographics (age, gender), services (internet, phone), billing (monthly charges), and the target variable: Churn (Yes/No)."),
-            ("Q3: What was your biggest finding?",
-             "Month-to-month contract customers churn at 42.7% vs only 2.8% for two-year contracts. This single insight saves the business millions — just convince customers to switch to annual contracts."),
-            ("Q4: Why did you choose Random Forest?",
-             "Random Forest handles mixed data types (text + numbers), doesn't need much preprocessing, and gives feature importance scores — which tells us WHICH factors cause churn. This is very valuable for business decisions."),
-            ("Q5: What is ROC-AUC?",
-             "It measures how well the model separates churners from non-churners. Score of 0.5 = random guessing. Score of 1.0 = perfect. My model scored 0.85 — meaning it's very good at ranking high-risk customers."),
-            ("Q6: How would the business use this model?",
-             "Run the model every month. Get a list of top 500 high-risk customers. Assign the retention team to call them with special offers (discount, free upgrade). This prevents churn before it happens."),
-            ("Q7: What is a Confusion Matrix?",
-             "It shows 4 things: customers correctly predicted as Retained, correctly predicted as Churned, wrongly flagged as churning (false alarm), and missed churners (we said they'd stay but they left). Missed churners are the most costly."),
-            ("Q8: How did you clean the data?",
-             "I checked for missing values — there were none. I removed duplicates. I converted text columns (like 'Yes'/'No') into numbers using Label Encoding so the ML model could understand them."),
-            ("Q9: What SQL did you use?",
-             "I used GROUP BY to find churn rates by contract and internet service. I used window functions for running totals and rank-based segmentation. I wrote CASE WHEN logic to label customers as High, Medium, or Low risk."),
-            ("Q10: What would you improve?",
-             "I would add SMOTE to handle class imbalance better, try XGBoost for higher accuracy, build a real-time scoring API using FastAPI, and set up monthly automated reports so leadership gets updates automatically."),
-        ]
-        for q, a in qas:
-            with st.expander(q):
-                st.write(a)
-
-    with tab3:
-        st.subheader("⚠️ Common Mistakes Beginners Make in Interviews")
-        mistakes = {
-            "❌ Saying 'I just ran the code'":
-                "✅ Say: 'I analyzed the business problem first, then chose the right technique.'",
-            "❌ Only talking about accuracy":
-                "✅ Always mention ROC-AUC, Precision, Recall — especially for imbalanced data.",
-            "❌ No business connection":
-                "✅ Always connect findings to money. Don't say '42.7% churn'. Say '$69,000/month lost from this segment.'",
-            "❌ Memorizing answers without understanding":
-                "✅ Understand the concept simply first. If you can explain it to a 10-year-old, you can explain it to an interviewer.",
-            "❌ Saying 'The model is 81% accurate' as if it's perfect":
-                "✅ Say: 'Accuracy is 81.76%, but more importantly the ROC-AUC is 0.85, which means the model is strong at identifying who will actually churn.'",
-            "❌ Not knowing your own numbers":
-                "✅ Memorize: 7,043 customers, 26.5% churn, $139K monthly loss, 81.76% accuracy, top 3 drivers.",
-        }
-        for mistake, fix in mistakes.items():
-            st.error(mistake)
-            st.success(fix)
-            st.write("")
