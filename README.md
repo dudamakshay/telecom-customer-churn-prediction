@@ -1,225 +1,243 @@
 # 📡 Telecom Customer Churn Prediction
-### End-to-End Analytics + AI/ML Portfolio Project | MNC-Level | ATS-Ready
+### End-to-End Data Analytics & Machine Learning Portfolio Project
 
 ![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python&logoColor=white)
 ![SQL](https://img.shields.io/badge/SQL-Advanced-336791?style=flat&logo=postgresql&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?style=flat&logo=scikit-learn&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-MachineLearning-F7931E?style=flat&logo=scikit-learn&logoColor=white)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=flat&logo=powerbi&logoColor=black)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=flat&logo=streamlit&logoColor=white)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?style=flat&logo=jupyter&logoColor=white)
 
 ---
 
-## 📌 Project Overview
+# 📌 Project Overview
 
-**TelecomCorp** serves 7,043 customers across multiple service tiers.
-This project identifies customers at risk of churning **before they leave** — enabling the retention team to act with targeted offers.
+Customer churn is one of the most critical business challenges in the telecom industry. This project analyzes telecom customer behavior and builds machine learning models to identify customers at high risk of churn before they leave.
 
-> **Business Impact:** 1,869 customers churned, causing **$139,131/month** ($1.67M/year) in lost revenue.
-> The predictive model enables targeted retention saving **$50,000+/month**.
+The project combines:
+
+- Data Cleaning
+- Exploratory Data Analysis (EDA)
+- SQL Analytics
+- Machine Learning Classification
+- Power BI Dashboarding
+- Business Insights & Recommendations
 
 ---
 
-## 📊 Key Results
+# 🎯 Business Problem
+
+Telecom companies lose significant revenue when customers discontinue services. Early identification of high-risk customers enables retention teams to take proactive actions such as:
+
+- Personalized retention offers
+- Contract conversion strategies
+- Loyalty incentives
+- Service quality improvements
+
+---
+
+# 📊 Key Results
 
 | Metric | Value |
 |---|---|
-| Dataset Size | 7,043 customers · 20 features |
-| Overall Churn Rate | **26.5%** |
-| Monthly Revenue Lost | **$139,131** |
-| Annual Revenue at Risk | **$1,669,572** |
-| Best Model | Logistic Regression |
-| Model Accuracy | **81.76%** |
-| ROC-AUC Score | **0.85** |
-| Top Churn Driver | Monthly Charges (17.7%) |
+| Dataset Size | 7,043 Customers |
+| Features | 20 |
+| Churn Rate | 26.5% |
+| Monthly Revenue at Risk | $139,131 |
+| Annual Revenue at Risk | $1.67M |
+| Best Performing Model | Logistic Regression Classifier |
+| Model Accuracy | 81.76% |
+| ROC-AUC Score | 0.85 |
 
 ---
 
-## 🔍 Key Findings
+# 🔍 Key Business Insights
 
-| Finding | Segment | Churn Rate | Priority |
-|---|---|---|---|
-| Month-to-month contracts | Contract Type | **42.7%** | 🔴 Critical |
-| Fiber optic internet | Internet Service | **41.9%** | 🔴 Critical |
-| Electronic check payment | Payment Method | **45.3%** | 🔴 Critical |
-| New customers 0–6 months | Tenure Band | **53.3%** | 🔴 Critical |
-| Two-year contracts | Contract Type | 2.8% | 🟢 Stable |
+| Finding | Churn Rate | Business Impact |
+|---|---|---|
+| Month-to-month contracts | 42.7% | High churn risk |
+| Fiber optic customers | 41.9% | Premium customer churn |
+| Electronic check users | 45.3% | Payment-related churn |
+| New customers (0–6 months) | 53.3% | Early-stage retention problem |
+| Two-year contracts | 2.8% | Strong retention segment |
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Technologies Used
 
-| Layer | Tools Used |
+| Category | Tools & Libraries |
 |---|---|
-| Data Analysis | Python, pandas, numpy |
-| Machine Learning | scikit-learn (LR, RF, GBM), matplotlib, seaborn |
-| Database / SQL | MySQL / PostgreSQL (window functions, segmentation) |
-| Visualization | Power BI, DAX measures |
-| Web App | Streamlit |
-| Version Control | Git, GitHub |
+| Programming | Python |
+| Data Analysis | pandas, numpy |
+| Visualization | matplotlib, seaborn |
+| Machine Learning | scikit-learn |
+| Dashboarding | Power BI |
+| Database Querying | SQL |
+| Notebook Workflow | Jupyter Notebook |
+| Version Control | Git & GitHub |
 
 ---
 
-## 🗂️ Project Structure
+# 🤖 Machine Learning Models
 
-```
-telecom-churn-prediction/
+## Problem Type
+Binary Classification
+
+## Models Implemented
+
+- Logistic Regression Classifier
+- Random Forest Classifier
+- Gradient Boosting Classifier
+
+## Evaluation Metrics
+
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- ROC-AUC Score
+
+---
+
+# 📈 Model Performance
+
+| Model | Accuracy | ROC-AUC | Purpose |
+|---|---|---|---|
+| Logistic Regression Classifier | 81.76% | 0.85 | Best explainability |
+| Random Forest Classifier | 79.84% | 0.83 | Feature importance analysis |
+| Gradient Boosting Classifier | 80.12% | 0.84 | Performance optimization |
+
+---
+
+# 📌 Top Churn Drivers
+
+The Random Forest Classifier identified the following key churn factors:
+
+1. Monthly Charges
+2. Tenure
+3. Total Charges
+4. Contract Type
+5. Payment Method
+
+---
+
+# 📊 Exploratory Data Analysis
+
+The project includes detailed exploratory data analysis to identify customer churn patterns and business trends.
+
+## Analysis Performed
+
+- Churn distribution analysis
+- Contract type analysis
+- Tenure segmentation
+- Internet service comparison
+- Payment method analysis
+- Correlation analysis
+- Revenue loss estimation
+
+---
+
+# 📊 Power BI Dashboard
+
+The Power BI dashboard provides interactive business intelligence visualizations for churn monitoring and decision-making.
+
+## Dashboard Features
+
+- KPI Cards
+- Churn Rate Analysis
+- Revenue at Risk
+- Contract Type Segmentation
+- Customer Risk Analysis
+- Retention Insights
+
+---
+
+# 📂 Project Structure
+
+```text
+customer-churn-prediction/
 │
 ├── data/
-│   └── IT_customer_churn.csv          # Raw dataset (7,043 rows)
+├── images/
+├── model/
+├── notebooks/
+│   └── customer_churn_analysis.ipynb
+│
+├── powerbi/
+│   └── customer_churn_dashboard.pbix
 │
 ├── scripts/
-│   ├── churn_analysis.py              # Main Python ML pipeline
-│   └── churn_app.py                   # Streamlit web app (5 pages)
+│   └── churn_analysis.py
 │
 ├── sql/
-│   └── advanced_churn_queries.sql     # 15 SQL queries incl. window functions
+│   └── advanced_churn_queries.sql
 │
-├── dashboard/
-│   └── churn_dashboard.html           # Interactive HTML dashboard
-│
-├── presentation/
-│   └── Churn_Prediction_Deck.pptx     # 10-slide professional deck
-│
-├── docs/
-│   └── Interview_Guide.html           # Full interview prep guide
-│
+├── README.md
 ├── requirements.txt
-└── README.md
+└── customer_churn_presentation.pptx
 ```
 
 ---
 
-## 🚀 How to Run
+# 📓 Jupyter Notebook Workflow
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/telecom-churn-prediction.git
-cd telecom-churn-prediction
-```
+The project notebook includes:
 
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+- Data preprocessing
+- EDA visualizations
+- Feature engineering
+- ML model training
+- Model evaluation
+- Business insights
+- Recommendations
 
-### 3. Run the ML pipeline
-```bash
-python scripts/churn_analysis.py
-```
-
-### 4. Launch the Streamlit app
-```bash
-streamlit run scripts/churn_app.py
-```
-
-### 5. Open the dashboard
-Open `dashboard/churn_dashboard.html` in any browser.
-
----
-
-## 📦 requirements.txt
-
-```
-pandas==2.1.0
-numpy==1.24.0
-scikit-learn==1.3.0
-matplotlib==3.7.2
-seaborn==0.12.2
-streamlit==1.28.0
-jupyter==1.0.0
+Notebook:
+```text
+notebooks/customer_churn_analysis.ipynb
 ```
 
 ---
 
-## 🤖 ML Models Compared
+# 📈 SQL Analysis Highlights
 
-| Model | Accuracy | ROC-AUC | Use Case |
-|---|---|---|---|
-| Logistic Regression | **81.76%** | **0.85** | Best explainability |
-| Random Forest | 79.84% | 0.83 | Feature importance |
-| Gradient Boosting | 80.12% | 0.84 | Max performance |
+Advanced SQL analysis includes:
 
-### Top Churn Drivers (Random Forest Feature Importance)
-1. **Monthly Charges** — 17.7%
-2. **Tenure** — 17.5%
-3. **Total Charges** — 16.8%
-4. **Contract Type** — 8.2%
-5. **Payment Method** — 5.1%
+- Customer segmentation
+- Revenue analysis
+- Churn risk categorization
+- Window functions
+- Trend analysis
+- Retention-focused queries
 
 ---
 
-## 📈 Advanced SQL Highlights
+# 💼 Business Recommendations
 
-- `RANK() OVER (PARTITION BY Contract ORDER BY MonthlyCharges DESC)` — top churners per segment
-- `LAG()` — compare churn rate changes across tenure bands
-- `PERCENT_RANK()` — customer percentile scoring by spend
-- `CASE WHEN` risk scoring — label every customer as High / Medium / Low risk
-- Revenue impact queries — monthly and annual loss by segment
-
----
-
-## 📊 Power BI Dashboard
-
-**KPI Cards:** Total Customers · Churn Rate % · Monthly Revenue Lost · Avg Tenure Churned
-
-**Visuals:**
-- Churn by Contract (Bar Chart)
-- Churn by Internet Service (Donut)
-- Tenure Trend Line
-- Revenue at Risk Treemap
-- High-Risk Customer Table
-
-**DAX Measures:**
-```dax
-Churn Rate % = DIVIDE([Churned Customers], [Total Customers], 0)
-Monthly Revenue at Risk = CALCULATE(SUM(MonthlyCharges), Churn = "Yes")
-Retention Rate % = 1 - [Churn Rate %]
-```
+1. Encourage long-term contracts through retention discounts.
+2. Improve onboarding for new customers during the first 90 days.
+3. Provide loyalty incentives for high-risk customers.
+4. Improve service quality for fiber optic users.
+5. Promote auto-pay methods to reduce churn probability.
 
 ---
 
-## 💼 Business Recommendations
+# 📝 Resume Project Summary
 
-1. **Convert M-t-M → Annual** — Offer 15% discount in months 3–6 → saves $50K/month
-2. **90-Day Onboarding Program** — Reduce 53.3% new-customer churn with welcome calls
-3. **Bundle Security Add-ons** — Include OnlineSecurity in base plans at signup
-4. **Fiber Optic Audit** — 41.9% churn despite premium pricing — investigate service quality
-5. **Auto-Pay Incentive** — $5/month discount to switch from electronic check (45.3% churn)
-
----
-
-## 📝 ATS Resume Bullets
-
-```
-• Built end-to-end customer churn prediction system for telecom dataset of 7,043 customers,
-  achieving 81.76% accuracy (ROC-AUC 0.85) using Logistic Regression and Random Forest in Python
-
-• Identified $139K/month revenue loss through SQL segmentation analysis revealing month-to-month
-  contract customers churn at 42.7% — 15x higher than two-year contract holders
-
-• Developed advanced SQL queries using window functions (RANK, LAG, PERCENT_RANK) to segment
-  50,000+ records into High/Medium/Low churn risk categories for retention team prioritisation
-
-• Built interactive Power BI dashboard with 4 KPI cards, DAX measures, and drill-through filters
-  visualising $1.67M annual revenue at risk across contract, internet, and payment segments
-
-• Deployed Streamlit web app enabling real-time churn risk scoring — any team member inputs
-  customer details and receives instant risk probability with personalised retention recommendations
-```
+- Built an end-to-end telecom customer churn prediction system using Python, SQL, Machine Learning, and Power BI.
+- Performed exploratory data analysis and customer segmentation on 7,043 telecom customers.
+- Developed classification models achieving 81.76% accuracy with ROC-AUC score of 0.85.
+- Identified high-risk churn segments causing approximately $1.67M annual revenue loss.
+- Created interactive Power BI dashboard for business intelligence and retention analysis.
 
 ---
 
-## 🎤 Interview One-Liner
+# 👤 Author
 
-> *"I built a churn prediction system for a telecom company with 7,043 customers. The 26.5% churn rate caused $139K in monthly revenue loss. My Logistic Regression model achieved 81.76% accuracy with ROC-AUC of 0.85, identifying that month-to-month contract customers churn 15× more than two-year customers — an insight that can save $50,000+/month through targeted retention."*
+**Dudam Akshay**  
+Data Analyst | Data Science Enthusiast
 
----
-
-## 👤 Author
-
-**[Your Name]** | Data Analyst / Data Scientist
-[LinkedIn](https://linkedin.com/in/yourprofile) · [Portfolio](https://yourportfolio.com) · [Email](mailto:you@email.com)
+- GitHub: https://github.com/dudamakshay
+- LinkedIn: https://www.linkedin.com/in/dudamakshay
 
 ---
 
-*⭐ Star this repo if it helped you!*
+⭐ If you found this project useful, consider starring the repository.
