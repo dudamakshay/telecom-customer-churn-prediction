@@ -18,6 +18,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+import joblib
+from pathlib import Path
 warnings.filterwarnings('ignore')
 
 from sklearn.model_selection import train_test_split
@@ -32,12 +34,17 @@ from sklearn.metrics import (
 # ─────────────────────────────────────────
 # SECTION 2: LOAD DATA
 # ─────────────────────────────────────────
-import os
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = SCRIPT_DIR.parent
+DATA_PATH = PROJECT_DIR / 'data' / 'IT_customer_churn.csv'
+IMAGES_DIR = PROJECT_DIR / 'images'
+MODEL_DIR = PROJECT_DIR / 'model'
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-data_path = os.path.join(BASE_DIR, 'data', 'IT_customer_churn.csv')
+# Create necessary directories
+IMAGES_DIR.mkdir(exist_ok=True)
+MODEL_DIR.mkdir(exist_ok=True)
 
-df = pd.read_csv(data_path)
+df = pd.read_csv(DATA_PATH)
 
 print("=" * 60)
 print("TELECOM CHURN PROJECT — DATA OVERVIEW")
@@ -150,9 +157,10 @@ axes[1, 2].set_title('Churn Rate by Senior Citizen Status')
 axes[1, 2].set_ylabel('Churn Rate (%)')
 
 plt.tight_layout()
-plt.savefig('churn_eda.png', dpi=150, bbox_inches='tight')
+eda_image_path = IMAGES_DIR / 'churn_eda.png'
+plt.savefig(eda_image_path, dpi=150, bbox_inches='tight')
 plt.show()
-print("EDA chart saved: churn_eda.png")
+print(f"EDA chart saved: {eda_image_path}")
 
 # ─────────────────────────────────────────
 # SECTION 6: ENCODING & FEATURE ENGINEERING
@@ -248,9 +256,10 @@ axes[1].set_ylabel('Actual')
 axes[1].set_xlabel('Predicted')
 
 plt.tight_layout()
-plt.savefig('churn_model.png', dpi=150, bbox_inches='tight')
+model_image_path = IMAGES_DIR / 'churn_model.png'
+plt.savefig(model_image_path, dpi=150, bbox_inches='tight')
 plt.show()
-print("Model chart saved: churn_model.png")
+print(f"Model chart saved: {model_image_path}")
 
 print("\n" + "=" * 60)
 print("PROJECT COMPLETE — READY FOR DEPLOYMENT")
@@ -261,13 +270,8 @@ print("Model 1      : Logistic Regression Classifier")
 print("Model 2      : Random Forest Classifier")
 print("=" * 60)
 
-import os
-import joblib
-
-# Ensure model folder exists
-os.makedirs("model", exist_ok=True)
-
 # Save model
-joblib.dump(lr_model, "model/logistic_regression_classifier.pkl")
+lr_model_path = MODEL_DIR / 'logistic_regression_classifier.pkl'
+joblib.dump(lr_model, lr_model_path)
 
-print("Model saved successfully in model/churn_model.pkl")
+print(f"Model saved successfully: {lr_model_path}")
